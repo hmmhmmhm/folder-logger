@@ -226,7 +226,7 @@ const chalk = require('chalk')
 // 포멧팅 함수 (기본함수를 예시로 동봉합니다.)
 const myLogFormat = (log, level, logger) => {
     let defaultFormat ='%time%  %level%  \t\b\b\b\b' + '%log%'
-    let time = moment(logger.momentOption).format('hh:mm:ss')
+    let time = moment(logger.momentOption).format('HH:mm:ss')
     let levelName = String(logger.levelNames[level]).toUpperCase()
     switch(levelName){
         case 'CRITICAL':

@@ -18,7 +18,7 @@ const levelNames = Object.keys(level)
 
 const defaultLogFormat = (log, level, logger) => {
     let defaultFormat ='%time%  %level%  \t\b\b\b\b' + '%log%'
-    let time = moment(logger.momentOption).format('hh:mm:ss')
+    let time = moment(logger.momentOption).format('HH:mm:ss')
     let levelName = String(logger.levelNames[level]).toUpperCase()
     switch(levelName){
         case 'CRITICAL':
