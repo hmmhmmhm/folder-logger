@@ -9,9 +9,9 @@ declare module 'folder-logger' {
     }
 
     interface ILogOption {
-        noPrint: boolean
-        noWrite: boolean
-        noFormat: boolean
+        noPrint?: boolean
+        noWrite?: boolean
+        noFormat?: boolean
     }
 
     enum MessageLevelNamesType {
