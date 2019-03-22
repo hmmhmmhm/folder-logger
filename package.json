@@ -1,6 +1,6 @@
 {
   "name": "folder-logger",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "📁 A module that helps you sort logs into physical folders according to their importance, save them to a file, and apply text formatting to all logs in batches.",
   "main": "logger.js",
   "type": "logger.d.ts",
