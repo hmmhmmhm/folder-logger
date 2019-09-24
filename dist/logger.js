@@ -69,6 +69,7 @@ var defaultLogFormat = function (log, level, logger) {
 };
 var FolderLogger = /** @class */ (function () {
     function FolderLogger(_logPath, option) {
+        if (option === void 0) { option = {}; }
         this.logTime = null;
         this.stream = [null, null, null, null, null];
         this.showLevel = (typeof option.level == 'undefined') ? 5 : option.level;

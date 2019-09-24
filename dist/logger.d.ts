@@ -49,7 +49,7 @@ declare class FolderLogger {
     logFormat?: LogFormatType;
     momentOption?: string;
     logPath: string;
-    constructor(_logPath: string, option: ILoggerConstructorOption);
+    constructor(_logPath: string, option?: ILoggerConstructorOption);
     readonly level: IMessageLevel;
     readonly levelNames: string[];
     /**
