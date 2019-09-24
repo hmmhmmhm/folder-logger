@@ -1,11 +1,20 @@
-const fs = require('fs')
-const fx = require('mkdir-recursive')
-const path = require('path')
-const moment = require('moment')
-const removeANSI = require("strip-ansi")
-const chalk = require('chalk')
+import fs from 'fs'
+import fx from 'mkdir-recursive'
+import path from 'path'
+import moment from 'moment'
+import removeANSI from 'strip-ansi'
+import chalk from 'chalk'
 
-const level = {
+export interface IMessageLevel {
+    info: 0
+    system: 1,
+    warn: 2,
+    error: 3,
+    critical: 4,
+    debug: 5
+}
+
+const level: IMessageLevel = {
     info: 0,
     system: 1,
     warn: 2,
@@ -14,7 +23,31 @@ const level = {
     debug: 5
 }
 
+export type MessageLevelType
+    = 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+
+export interface ILogOption {
+    noPrint?: boolean
+    noWrite?: boolean
+    noFormat?: boolean
+    level?: MessageLevelType
+}
+
 const levelNames = Object.keys(level)
+
+export enum MessageLevelNamesType {
+    "info",
+    "system",
+    "warn",
+    "error",
+    "critical",
+    "debug"
+}
 
 const defaultLogFormat = (log, level, logger) => {
     let defaultFormat ='%time%  %level%  \t\b\b\b\b' + '%log%'
@@ -60,10 +93,42 @@ const defaultLogFormat = (log, level, logger) => {
     return text
 }
 
+export type LogFormatType = (log: string, level: MessageLevelNamesType, logger: FolderLogger) => string 
+
+export interface ILoggerConstructorOption {
+    /**
+     * `txt`
+     */
+    ext?: string
+
+    /**
+     * `YYYY-MM-DD`
+     */
+    timeFormat?: string
+
+    /**
+     * `2090-11-11T11:11:11`
+     */
+    momentOption?: string
+
+    level?: MessageLevelType
+
+    logFormat?: LogFormatType
+}
+
+export type StreamType = Array<fs.WriteStream | null>
+
 class FolderLogger {
-    constructor(_logPath, option={}){
-        this.logTime = null
-        this.stream = [null,null,null,null,null]
+    logTime: string | null = null
+    stream: StreamType = [null,null,null,null,null]
+    showLevel?: MessageLevelType
+    ext?: string
+    timeFormat?: string
+    logFormat?: LogFormatType
+    momentOption?: string
+    logPath: string
+
+    constructor(_logPath: string, option: ILoggerConstructorOption){
         this.showLevel = (typeof option.level == 'undefined') ? 5 : option.level
         this.ext = (typeof option.ext == 'undefined') ? 'log' : option.ext
         this.timeFormat = (typeof option.timeFormat == 'undefined') ? 
@@ -86,42 +151,42 @@ class FolderLogger {
      * 
      * @param {number} _level 
      */
-    setLevel(_level){
+    setLevel(_level: MessageLevelType){
         this.showLevel = _level
         return this
     }
 
-    info(input, option={}){
+    info(input: string, option: ILogOption = {}){
         option.level = level.info
         this.log(input, option)
         return this
     }
-    system(input, option={}){
+    system(input: string, option: ILogOption = {}){
         option.level = level.system
         this.log(input, option)
         return this
     }
-    warn(input, option={}){
+    warn(input: string, option: ILogOption = {}){
         option.level = level.warn
         this.log(input, option)
         return this
     }
-    error(input, option={}){
+    error(input: string, option: ILogOption = {}){
         option.level = level.error
         this.log(input, option)
         return this
     }
-    critical(input, option={}){
+    critical(input: string, option: ILogOption = {}){
         option.level = level.critical
         this.log(input, option)
         return this
     }
-    debug(input, option={}){
+    debug(input: string, option: ILogOption = {}){
         option.level = level.debug
         this.log(input, option)
         return this
     }
-    log(input, option={}){
+    log(input: string, option: ILogOption){
         // Init Default Options
         if(typeof option != 'object') option = {}
         if(typeof option.level == 'undefined') option.level = level.info
@@ -146,7 +211,7 @@ class FolderLogger {
 
         // Apply Log Format
         let logText = input
-        if(!option.noFormat)
+        if(!option.noFormat && this.logFormat)
             logText = this.logFormat(logText, option.level, this)
 
         // Append Log Text
@@ -156,11 +221,12 @@ class FolderLogger {
 
             // Remove some escape sequences
             clearedText = `${clearedText.replace(/[\t\b]/gi, '')}\n`
-            this.stream[option.level].write(clearedText)
+            let dataStream = this.stream[option.level]
+            if(dataStream != null) dataStream.write(clearedText)
         }
 
         // Print Log Text
-        if(!isNaN(this.showLevel) && Number(this.showLevel) >= Number(option.level)){
+        if(!isNaN(Number(this.showLevel)) && Number(this.showLevel) >= Number(option.level)){
             if(!option.noPrint){
                 if(option.noFormat){
                     process.stdout.write(logText)
@@ -171,7 +237,7 @@ class FolderLogger {
         }
         return this
     }
-    setLogPath(_logPath){
+    setLogPath(_logPath: string){
         fx.mkdirSync(_logPath)
         this.logPath = _logPath
         this.checkRefresh()
@@ -193,12 +259,14 @@ class FolderLogger {
     close(){
         // Close Before Stream
         for(let i=0;i<=5;i++){
-            if(this.stream[i] != null){
-                this.stream[i].end()
-                this.stream[i] = null
+            let dataStream = this.stream[i]
+            if(dataStream != null){
+                dataStream.end()
+                dataStream = null
             }
         }
     }
 }
 
-module.exports = FolderLogger
+export { FolderLogger }
+export default FolderLogger
