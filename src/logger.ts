@@ -128,7 +128,7 @@ class FolderLogger {
     momentOption?: string
     logPath: string
 
-    constructor(_logPath: string, option: ILoggerConstructorOption){
+    constructor(_logPath: string, option: ILoggerConstructorOption = {}){
         this.showLevel = (typeof option.level == 'undefined') ? 5 : option.level
         this.ext = (typeof option.ext == 'undefined') ? 'log' : option.ext
         this.timeFormat = (typeof option.timeFormat == 'undefined') ? 
