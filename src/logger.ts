@@ -51,31 +51,37 @@ export enum MessageLevelNamesType {
 }
 
 const defaultLogFormat = (log, level, logger) => {
-    let defaultFormat ='%time%  %level%  \t\b\b\b\b' + '%log%'
     let time = moment(logger.momentOption).format('HH:mm:ss')
     let levelName = String(logger.levelNames[level]).toUpperCase()
-    switch(levelName){
+
+    let margin = ''
+    switch (levelName) {
         case 'CRITICAL':
+            margin = '  '
             time = chalk.bgRedBright(chalk.black(time))
             levelName = chalk.bgRedBright(chalk.black(levelName))
             log = chalk.bgRedBright(chalk.black(log))
             break
         case 'WARN':
+            margin = '      '
             time = chalk.bgYellowBright(chalk.black(time))
             levelName = chalk.bgYellowBright(chalk.black(levelName))
             log = chalk.bgYellowBright(chalk.black(log))
             break
         case 'ERROR':
+            margin = '     '
             time = chalk.bgRedBright(chalk.white(time))
             levelName = chalk.bgRedBright(chalk.white(levelName))
             log = chalk.bgRedBright(chalk.white(log))
             break
         case 'DEBUG':
+            margin = '     '
             time = chalk.greenBright(time)
             levelName = chalk.greenBright(levelName)
             log = chalk.greenBright(log)
             break
         case 'SYSTEM':
+            margin = '    '
             time = chalk.yellowBright(time)
             levelName = chalk.yellowBright(levelName)
             log = chalk.yellowBright(log)
@@ -87,6 +93,7 @@ const defaultLogFormat = (log, level, logger) => {
             log = chalk.white(log)
             break
     }
+    let defaultFormat = `%time%  %level%${margin} %log%`
     let text = defaultFormat
         .replace('%time%', time)
         .replace('%level%', levelName)
@@ -94,7 +101,7 @@ const defaultLogFormat = (log, level, logger) => {
     return text
 }
 
-export type LogFormatType = (log: string, level: MessageLevelNamesType, logger: FolderLogger) => string 
+export type LogFormatType = (log: string, level: MessageLevelNamesType, logger: FolderLogger) => string
 
 export interface ILoggerConstructorOption {
     /**
@@ -121,7 +128,7 @@ export type StreamType = Array<fs.WriteStream | null>
 
 class FolderLogger {
     logTime: string | null = null
-    stream: StreamType = [null,null,null,null,null]
+    stream: StreamType = [null, null, null, null, null]
     showLevel?: MessageLevelType
     ext?: string
     timeFormat?: string
@@ -129,22 +136,22 @@ class FolderLogger {
     momentOption?: string
     logPath: string
 
-    constructor(_logPath: string, option: ILoggerConstructorOption = {}){
+    constructor(_logPath: string, option: ILoggerConstructorOption = {}) {
         this.showLevel = (typeof option.level == 'undefined') ? 5 : option.level
         this.ext = (typeof option.ext == 'undefined') ? 'log' : option.ext
-        this.timeFormat = (typeof option.timeFormat == 'undefined') ? 
+        this.timeFormat = (typeof option.timeFormat == 'undefined') ?
             'YYYY-MM-DD' : option.timeFormat
         this.logFormat = (typeof option.logFormat == 'undefined') ?
             defaultLogFormat : option.logFormat
-        this.momentOption = (typeof option.momentOption == 'undefined') ? 
+        this.momentOption = (typeof option.momentOption == 'undefined') ?
             undefined : option.momentOption
         this.setLogPath(_logPath)
     }
 
-    get level(){
+    get level() {
         return level
     }
-    get levelNames(){
+    get levelNames() {
         return levelNames
     }
 
@@ -152,103 +159,103 @@ class FolderLogger {
      * 
      * @param {number} _level 
      */
-    setLevel(_level: MessageLevelType){
+    setLevel(_level: MessageLevelType) {
         this.showLevel = _level
         return this
     }
 
-    info(input: string, option: ILogOption = {}){
+    info(input: string, option: ILogOption = {}) {
         option.level = level.info
         this.log(input, option)
         return this
     }
-    system(input: string, option: ILogOption = {}){
+    system(input: string, option: ILogOption = {}) {
         option.level = level.system
         this.log(input, option)
         return this
     }
-    warn(input: string, option: ILogOption = {}){
+    warn(input: string, option: ILogOption = {}) {
         option.level = level.warn
         this.log(input, option)
         return this
     }
-    error(input: string, option: ILogOption = {}){
+    error(input: string, option: ILogOption = {}) {
         option.level = level.error
         this.log(input, option)
         return this
     }
-    critical(input: string, option: ILogOption = {}){
+    critical(input: string, option: ILogOption = {}) {
         option.level = level.critical
         this.log(input, option)
         return this
     }
-    debug(input: string, option: ILogOption = {}){
+    debug(input: string, option: ILogOption = {}) {
         option.level = level.debug
         this.log(input, option)
         return this
     }
-    log(input: string, option: ILogOption){
+    log(input: string, option: ILogOption) {
         // Init Default Options
-        if(typeof option != 'object') option = {}
-        if(typeof option.level == 'undefined') option.level = level.info
-        if(typeof option.noPrint == 'undefined') option.noPrint = false
-        if(typeof option.noFormat == 'undefined') option.noFormat = false
-        if(typeof option.useProcessOut == 'undefined') option.useProcessOut = false
-        if(typeof option.noWrite == 'undefined') option.noWrite = false
+        if (typeof option != 'object') option = {}
+        if (typeof option.level == 'undefined') option.level = level.info
+        if (typeof option.noPrint == 'undefined') option.noPrint = false
+        if (typeof option.noFormat == 'undefined') option.noFormat = false
+        if (typeof option.useProcessOut == 'undefined') option.useProcessOut = false
+        if (typeof option.noWrite == 'undefined') option.noWrite = false
 
         // Check Log Level Range
-        if(typeof levelNames[option.level] == 'undefined')
+        if (typeof levelNames[option.level] == 'undefined')
             throw new Error('Log level is wrong')
 
         // Open New Stream
-        if(this.stream[option.level] == null){
+        if (this.stream[option.level] == null) {
             fx.mkdirSync(path.join(this.logPath, `/${levelNames[option.level]}`))
             this.stream[option.level] = fs.createWriteStream(
                 path.join(
-                    this.logPath, 
+                    this.logPath,
                     `/${levelNames[option.level]}/${this.logTime}.${this.ext}`
-                ), {flags: 'a'}
+                ), { flags: 'a' }
             )
         }
 
         // Apply Log Format
         let logText = input
-        if(!option.noFormat && this.logFormat)
+        if (!option.noFormat && this.logFormat)
             logText = this.logFormat(logText, option.level, this)
 
         // Append Log Text
-        if(!option.noWrite){
+        if (!option.noWrite) {
             // Remove ANSI
             let clearedText = removeANSI(logText)
 
             // Remove some escape sequences
             clearedText = `${clearedText.replace(/[\t\b]/gi, '')}\n`
             let dataStream = this.stream[option.level]
-            if(dataStream != null) dataStream.write(clearedText)
+            if (dataStream != null) dataStream.write(clearedText)
         }
 
         // Print Log Text
-        if(!isNaN(Number(this.showLevel)) && Number(this.showLevel) >= Number(option.level)){
-            if(!option.noPrint){
-                if(option.useProcessOut){
+        if (!isNaN(Number(this.showLevel)) && Number(this.showLevel) >= Number(option.level)) {
+            if (!option.noPrint) {
+                if (option.useProcessOut) {
                     process.stdout.write(logText)
-                }else{
+                } else {
                     console.log(logText)
                 }
             }
         }
         return this
     }
-    setLogPath(_logPath: string){
+    setLogPath(_logPath: string) {
         fx.mkdirSync(_logPath)
         this.logPath = _logPath
         this.checkRefresh()
 
         return this
     }
-    checkRefresh(){
+    checkRefresh() {
         let newLogTime = moment(this.momentOption).format(this.timeFormat)
-        if(this.logTime != newLogTime){
+        if (this.logTime != newLogTime) {
 
             // Refrash Log Time
             this.logTime = newLogTime
@@ -258,11 +265,11 @@ class FolderLogger {
         }
         return this
     }
-    close(){
+    close() {
         // Close Before Stream
-        for(let i=0;i<=5;i++){
+        for (let i = 0; i <= 5; i++) {
             let dataStream = this.stream[i]
-            if(dataStream != null){
+            if (dataStream != null) {
                 dataStream.end()
                 dataStream = null
             }

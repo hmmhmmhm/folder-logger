@@ -1,12 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var tslib_1 = require("tslib");
-var fs_1 = tslib_1.__importDefault(require("fs"));
-var mkdir_recursive_1 = tslib_1.__importDefault(require("mkdir-recursive"));
-var path_1 = tslib_1.__importDefault(require("path"));
-var moment_1 = tslib_1.__importDefault(require("moment"));
-var strip_ansi_1 = tslib_1.__importDefault(require("strip-ansi"));
-var chalk_1 = tslib_1.__importDefault(require("chalk"));
+var fs_1 = __importDefault(require("fs"));
+var mkdir_recursive_1 = __importDefault(require("mkdir-recursive"));
+var path_1 = __importDefault(require("path"));
+var moment_1 = __importDefault(require("moment"));
+var strip_ansi_1 = __importDefault(require("strip-ansi"));
+var chalk_1 = __importDefault(require("chalk"));
 var level = {
     info: 0,
     system: 1,
@@ -26,31 +28,36 @@ var MessageLevelNamesType;
     MessageLevelNamesType[MessageLevelNamesType["debug"] = 5] = "debug";
 })(MessageLevelNamesType = exports.MessageLevelNamesType || (exports.MessageLevelNamesType = {}));
 var defaultLogFormat = function (log, level, logger) {
-    var defaultFormat = '%time%  %level%  \t\b\b\b\b' + '%log%';
     var time = moment_1.default(logger.momentOption).format('HH:mm:ss');
     var levelName = String(logger.levelNames[level]).toUpperCase();
+    var margin = '';
     switch (levelName) {
         case 'CRITICAL':
+            margin = '  ';
             time = chalk_1.default.bgRedBright(chalk_1.default.black(time));
             levelName = chalk_1.default.bgRedBright(chalk_1.default.black(levelName));
             log = chalk_1.default.bgRedBright(chalk_1.default.black(log));
             break;
         case 'WARN':
+            margin = '      ';
             time = chalk_1.default.bgYellowBright(chalk_1.default.black(time));
             levelName = chalk_1.default.bgYellowBright(chalk_1.default.black(levelName));
             log = chalk_1.default.bgYellowBright(chalk_1.default.black(log));
             break;
         case 'ERROR':
+            margin = '     ';
             time = chalk_1.default.bgRedBright(chalk_1.default.white(time));
             levelName = chalk_1.default.bgRedBright(chalk_1.default.white(levelName));
             log = chalk_1.default.bgRedBright(chalk_1.default.white(log));
             break;
         case 'DEBUG':
+            margin = '     ';
             time = chalk_1.default.greenBright(time);
             levelName = chalk_1.default.greenBright(levelName);
             log = chalk_1.default.greenBright(log);
             break;
         case 'SYSTEM':
+            margin = '    ';
             time = chalk_1.default.yellowBright(time);
             levelName = chalk_1.default.yellowBright(levelName);
             log = chalk_1.default.yellowBright(log);
@@ -61,6 +68,7 @@ var defaultLogFormat = function (log, level, logger) {
             log = chalk_1.default.white(log);
             break;
     }
+    var defaultFormat = "%time%  %level%" + margin + " %log%";
     var text = defaultFormat
         .replace('%time%', time)
         .replace('%level%', levelName)
