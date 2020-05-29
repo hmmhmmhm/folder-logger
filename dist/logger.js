@@ -150,6 +150,8 @@ var FolderLogger = /** @class */ (function () {
             option.noPrint = false;
         if (typeof option.noFormat == 'undefined')
             option.noFormat = false;
+        if (typeof option.useProcessOut == 'undefined')
+            option.useProcessOut = false;
         if (typeof option.noWrite == 'undefined')
             option.noWrite = false;
         // Check Log Level Range
@@ -177,7 +179,7 @@ var FolderLogger = /** @class */ (function () {
         // Print Log Text
         if (!isNaN(Number(this.showLevel)) && Number(this.showLevel) >= Number(option.level)) {
             if (!option.noPrint) {
-                if (option.noFormat) {
+                if (option.useProcessOut) {
                     process.stdout.write(logText);
                 }
                 else {

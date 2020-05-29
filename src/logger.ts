@@ -35,6 +35,7 @@ export interface ILogOption {
     noPrint?: boolean
     noWrite?: boolean
     noFormat?: boolean
+    useProcessOut?: boolean
     level?: MessageLevelType
 }
 
@@ -192,6 +193,7 @@ class FolderLogger {
         if(typeof option.level == 'undefined') option.level = level.info
         if(typeof option.noPrint == 'undefined') option.noPrint = false
         if(typeof option.noFormat == 'undefined') option.noFormat = false
+        if(typeof option.useProcessOut == 'undefined') option.useProcessOut = false
         if(typeof option.noWrite == 'undefined') option.noWrite = false
 
         // Check Log Level Range
@@ -228,7 +230,7 @@ class FolderLogger {
         // Print Log Text
         if(!isNaN(Number(this.showLevel)) && Number(this.showLevel) >= Number(option.level)){
             if(!option.noPrint){
-                if(option.noFormat){
+                if(option.useProcessOut){
                     process.stdout.write(logText)
                 }else{
                     console.log(logText)

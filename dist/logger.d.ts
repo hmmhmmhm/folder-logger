@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import fs from 'fs';
 export interface IMessageLevel {
     info: 0;
@@ -12,6 +13,7 @@ export interface ILogOption {
     noPrint?: boolean;
     noWrite?: boolean;
     noFormat?: boolean;
+    useProcessOut?: boolean;
     level?: MessageLevelType;
 }
 export declare enum MessageLevelNamesType {
@@ -50,8 +52,8 @@ declare class FolderLogger {
     momentOption?: string;
     logPath: string;
     constructor(_logPath: string, option?: ILoggerConstructorOption);
-    readonly level: IMessageLevel;
-    readonly levelNames: string[];
+    get level(): IMessageLevel;
+    get levelNames(): string[];
     /**
      *
      * @param {number} _level
